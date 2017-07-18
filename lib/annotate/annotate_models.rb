@@ -209,7 +209,7 @@ module AnnotateModels
 
       max_size = klass.column_names.map(&:size).max || 0
       with_comment = options[:with_comment] && klass.columns.first.respond_to?(:comment)
-      max_size = klass.columns.map{|col| col.name.size + col.comment.size }.max || 0 if with_comment
+      max_size = klass.columns.map{|col| col.name.size + (col.comment&.size || 0) }.max || 0 if with_comment
       max_size += 2 if with_comment
       max_size += options[:format_rdoc] ? 5 : 1
       md_names_overhead = 6
@@ -275,7 +275,7 @@ module AnnotateModels
           end
         end
         col_name = if with_comment
-                     "#{col.name}(#{col.comment})"
+                      col.comment.present? ? "#{col.name}(#{col.comment})" : col.name
                    else
                      col.name
                    end
